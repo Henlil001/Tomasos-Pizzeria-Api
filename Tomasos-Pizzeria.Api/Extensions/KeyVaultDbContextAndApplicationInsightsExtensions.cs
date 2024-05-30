@@ -14,7 +14,7 @@ namespace Tomasos_Pizzeria.Api.Extensions
 
         public static async Task AddKeyVaultDbContextAndApplicationInsightsExtendedAsync(this WebApplicationBuilder builder)
         {
-            ////sätta upp keyvault
+            //sätta upp keyvault
             var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL");
 
             var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
@@ -33,7 +33,7 @@ namespace Tomasos_Pizzeria.Api.Extensions
             //Lägger till ApplicationInsights
             builder.Services.AddApplicationInsightsTelemetry(applicationInsightsConnString);
 
-         
+
 
             // Skapar upp databasen med våra entiteis-klass som blir en tabell
             builder.Services.AddDbContext<PizzeriaDbContext>(options =>

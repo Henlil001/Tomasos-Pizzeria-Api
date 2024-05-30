@@ -17,17 +17,12 @@ namespace Tomasos_Pizzeria.Data.Repos
         public async Task<bool> DeleteOrderAsync(int orderId)
         {
             var selectedOrder = await _context.Orders
-                                .Include(o => o.Foods)
-                                .SingleOrDefaultAsync(o => o.OrderID == orderId);
+                 .Include(o => o.FoodOrders)
+                     .ThenInclude(of => of.Food)
+                     .SingleOrDefaultAsync(o => o.OrderID == orderId);
 
             if (selectedOrder is null)
                 return false;
-
-            // Ta bort ordern från alla maträtter som den har
-            foreach (var food in selectedOrder.Foods)
-            {
-                food.Orders.Remove(selectedOrder);
-            }
 
             _context.Orders.Remove(selectedOrder);
             await _context.SaveChangesAsync();
@@ -37,10 +32,10 @@ namespace Tomasos_Pizzeria.Data.Repos
         public async Task<List<Order>> GetAllOrdersAsync()
         {
             return await _context.Orders
-                    .Include(o => o.Foods)
-                    .ThenInclude(f => f.Category)
-                    .AsNoTracking()
-                    .ToListAsync();
+                .Include(o => o.FoodOrders)
+                         .ThenInclude(of => of.Food)
+                         .ThenInclude(f => f.Category)
+                 .AsNoTracking().ToListAsync();
         }
 
         public async Task<List<Order>> GetOrderByUserIdAsync(string userId)

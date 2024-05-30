@@ -37,7 +37,7 @@ namespace Tomasos_Pizzeria.Api.Controllers
                 BadRequest("Food Dosent exist");
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet]
         [Route("GetAll")]
         public async Task<IActionResult> GetAllFoodsAsync()

@@ -28,7 +28,7 @@ namespace Tomasos_Pizzeria.Data.Repos
 
         public async Task<List<Ingredient>> GetAllIngredientsAsync()
         {
-            return await _context.Ingredients.Include(i=>i.Foods).AsNoTracking().ToListAsync();
+            return await _context.Ingredients.AsNoTracking().ToListAsync();
         }
 
         public async Task<bool> UppdateIngredientAsync(int ingredientId, string newIngrident)

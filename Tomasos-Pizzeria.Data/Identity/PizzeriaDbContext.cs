@@ -27,12 +27,14 @@ namespace Tomasos_Pizzeria.Data.Identity
             modelBuilder.Entity<FoodOrder>()
                 .HasOne(fo => fo.Food)
                 .WithMany(f => f.FoodOrders)
-                .HasForeignKey(fo => fo.FoodID);
+                .HasForeignKey(fo => fo.FoodID)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<FoodOrder>()
                 .HasOne(fo => fo.Order)
                 .WithMany(o => o.FoodOrders)
-                .HasForeignKey(fo => fo.OrderID);
+                .HasForeignKey(fo => fo.OrderID)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

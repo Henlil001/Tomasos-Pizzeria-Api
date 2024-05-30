@@ -34,7 +34,7 @@ namespace Tomasos_Pizzeria.Data.Migrations
 
                     b.HasIndex("IngredientsIngredientID");
 
-                    b.ToTable("FoodIngredient");
+                    b.ToTable("FoodIngredient", (string)null);
                 });
 
             modelBuilder.Entity("FoodOrder", b =>
@@ -49,7 +49,7 @@ namespace Tomasos_Pizzeria.Data.Migrations
 
                     b.HasIndex("OrdersOrderID");
 
-                    b.ToTable("FoodOrder");
+                    b.ToTable("FoodOrder", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -268,7 +268,7 @@ namespace Tomasos_Pizzeria.Data.Migrations
 
                     b.HasKey("CategoryID");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Tomasos_Pizzeria.Domain.Entities.Food", b =>
@@ -298,7 +298,7 @@ namespace Tomasos_Pizzeria.Data.Migrations
 
                     b.HasIndex("CategoryID");
 
-                    b.ToTable("Foods");
+                    b.ToTable("Foods", (string)null);
                 });
 
             modelBuilder.Entity("Tomasos_Pizzeria.Domain.Entities.FoodOrder", b =>
@@ -316,7 +316,7 @@ namespace Tomasos_Pizzeria.Data.Migrations
 
                     b.HasIndex("OrderID");
 
-                    b.ToTable("FoodOrders");
+                    b.ToTable("FoodOrders", (string)null);
                 });
 
             modelBuilder.Entity("Tomasos_Pizzeria.Domain.Entities.Ingredient", b =>
@@ -334,7 +334,7 @@ namespace Tomasos_Pizzeria.Data.Migrations
 
                     b.HasKey("IngredientID");
 
-                    b.ToTable("Ingredients");
+                    b.ToTable("Ingredients", (string)null);
                 });
 
             modelBuilder.Entity("Tomasos_Pizzeria.Domain.Entities.Order", b =>
@@ -370,7 +370,7 @@ namespace Tomasos_Pizzeria.Data.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("FoodIngredient", b =>

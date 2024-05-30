@@ -27,10 +27,11 @@ namespace Tomasos_Pizzeria.Data.Repos
         public async Task<bool> DeleteFoodAsync(int id)
         {
             var foodToDelete = await _context.Foods
-            .Include(f => f.Ingredients)
-            .Include(f => f.Orders)
-            .Include(f => f.Category)
-            .SingleOrDefaultAsync(f => f.FoodID == id);
+             .Include(f => f.FoodOrders) // Include the junction table
+             .ThenInclude(fo => fo.Order)
+             .Include(f => f.Ingredients)
+             .Include(f => f.Category)
+             .SingleOrDefaultAsync(f => f.FoodID == id);
 
             if (foodToDelete == null)
                 return false;
@@ -51,40 +52,32 @@ namespace Tomasos_Pizzeria.Data.Repos
             }
 
             // Remove the food from all orders
-            if (foodToDelete.Orders != null)
+            foreach (var foodOrder in foodToDelete.FoodOrders)
             {
-                foreach (var order in foodToDelete.Orders)
+                var order = await _context.Orders
+                    .Include(o => o.FoodOrders)
+                    .SingleOrDefaultAsync(o => o.OrderID == foodOrder.OrderID);
+                if (order != null)
                 {
-                    order.Foods.Remove(foodToDelete);
+                    order.FoodOrders.Remove(foodOrder);
                 }
             }
 
             // Remove the food from all ingredients
-            if (foodToDelete.Ingredients != null)
+            foreach (var ingredient in foodToDelete.Ingredients)
             {
-                foreach (var ingredient in foodToDelete.Ingredients)
-                {
-                    ingredient.Foods.Remove(foodToDelete);
-                }
+                if(ingredient.Foods != null)
+                ingredient.Foods.Remove(foodToDelete);
             }
 
+            // Remove all FoodOrder entries related to this food
+            _context.FoodOrders.RemoveRange(foodToDelete.FoodOrders);
+
+            // Finally, remove the food itself
             _context.Foods.Remove(foodToDelete);
             await _context.SaveChangesAsync();
 
             return true;
-        }
-        public async Task FoodToOrderAsync(List<Food> updatedFoods, List<Food> oldFoods)
-        {
-            foreach (var newFood in updatedFoods)
-            {
-                foreach (var oldfood in oldFoods)
-                {
-                    _context.Entry(oldfood).CurrentValues.SetValues(newFood);
-                    await _context.SaveChangesAsync();
-                }
-            }
-            await _context.SaveChangesAsync();
-
         }
 
         public async Task<List<Food>> GetAllFoodsAsync()
@@ -103,7 +96,8 @@ namespace Tomasos_Pizzeria.Data.Repos
 
             //Hämtar maträtten som vi vill uppdatera medföljande ordrar 
             var selectedFood = await _context.Foods
-                        .Include(f => f.Orders)
+                        .Include(f => f.FoodOrders)
+                        .ThenInclude(fo=>fo.Order)
                         .SingleOrDefaultAsync(f => f.FoodID == foodDTO.FoodID);
             //Hämtar den nya kategorin
             var category = await _context.Categories
@@ -135,18 +129,6 @@ namespace Tomasos_Pizzeria.Data.Repos
         }
         public async Task<List<Food>> GetFoodsByIdAsync(List<int> foodIds)
         {
-            //var foodsToAdd = new List<Food>();
-            //foreach (var foodId in foodIds)
-            //{
-            //    var food = await _context.Foods.Include(f => f.Category).Include(f => f.Ingredients).Include(f => f.Orders).FirstOrDefaultAsync(f => f.FoodID == foodId);
-            //    if (food != null)
-            //    {
-            //        foodsToAdd.Add(food);
-            //    }
-            //}
-            //return foodsToAdd;
-
-
             var foods = await _context.Foods //om det är samma id två gånger tar den bara med det 1 gång måste fixa de
                                  .Where(f => foodIds.Contains(f.FoodID))
                                  .Include(f => f.Category)
