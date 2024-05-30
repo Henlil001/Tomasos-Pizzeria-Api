@@ -1,12 +1,5 @@
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Tomasos_Pizzeria.Api.Extensions;
-using Tomasos_Pizzeria.Core;
 using Tomasos_Pizzeria.Data.Identity;
 
 namespace Tomasos_Pizzeria.Api

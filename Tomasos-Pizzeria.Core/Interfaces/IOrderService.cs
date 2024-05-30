@@ -1,4 +1,5 @@
-﻿using Tomasos_Pizzeria.Domain.Entities;
+﻿using Tomasos_Pizzeria.Domain.DTO;
+using Tomasos_Pizzeria.Domain.Entities;
 
 namespace Tomasos_Pizzeria.Core.Interfaces
 {
@@ -7,7 +8,7 @@ namespace Tomasos_Pizzeria.Core.Interfaces
         Task<bool> DeleteOrderAsync(int orderId);
         Task<List<Order>> GetAllOrdersAsync();
         Task<List<Order>> GetOrdersByUserIdAsync(string userId);
-        Task PlaceOrderAsync(List<int> foodIds, string userRole, string userId);
+        Task PlaceOrderAsync(List<OrderFoodDTO> foods, string userRole, string userId);
         Task<bool> UpdateOrderStatusAsync(int orderId, string Status);
     }
 }

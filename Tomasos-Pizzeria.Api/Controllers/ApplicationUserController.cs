@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using Tomasos_Pizzeria.Core;
 using Tomasos_Pizzeria.Core.Interfaces;
 using Tomasos_Pizzeria.Domain.DTO;
@@ -70,6 +71,29 @@ namespace Tomasos_Pizzeria.Api.Controllers
             return result is true ?
                 Ok($"User \"{userNameToDowngrade}\" downgraded to Regular") :
                 BadRequest("User dosent exist/ Role was not changed.");
+        }
+
+        [Route("api/[action]")]
+        [Authorize]
+        [HttpPut]
+        public async Task<IActionResult> UpdateUserAsync(UserDTO user)
+        {
+            if (ModelState.IsValid)
+            {
+                var id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                await _applicationUserService.UpdateUserAsync(user, id);
+                return Ok("User Updated");
+            }
+            return BadRequest(); 
+        }
+        [Route("api/[action]")]
+        [Authorize]
+        [HttpPut]
+        public async Task<IActionResult> ChangePasswordAsync(string newPassword)
+        {
+            var id = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            bool result = await _applicationUserService.ChangePasswordAsync(newPassword, id);
+            return result is true ? Ok("Password changed Successfully") : BadRequest("The new password did not meet all criteria. Try again.");
         }
 
         [Route("api/[action]")]

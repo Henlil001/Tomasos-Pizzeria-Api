@@ -10,5 +10,6 @@ namespace Tomasos_Pizzeria.Data.Interfaces
         Task<List<Food>> GetAllFoodsAsync();
         Task<bool> UpdateFoodAsync(FoodDTO food);
         Task<List<Food>> GetFoodsByIdAsync(List<int> foodIds);
+        Task FoodToOrderAsync(List<Food> updatedFoods, List<Food> oldFoods);
     }
 }

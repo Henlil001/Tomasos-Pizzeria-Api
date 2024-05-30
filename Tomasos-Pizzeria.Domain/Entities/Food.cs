@@ -18,5 +18,6 @@ namespace Tomasos_Pizzeria.Domain.Entities
         public virtual ICollection<Ingredient> Ingredients { get; set; }
         public virtual ICollection<Order>? Orders { get; set; }
         public virtual Category Category { get; set; }
+        public ICollection<FoodOrder> FoodOrders { get; set; }
     }
 }

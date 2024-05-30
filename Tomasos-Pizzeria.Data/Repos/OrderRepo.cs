@@ -46,11 +46,12 @@ namespace Tomasos_Pizzeria.Data.Repos
         public async Task<List<Order>> GetOrderByUserIdAsync(string userId)
         {
             return await _context.Orders
-                       .Include(o => o.Foods)
-                           .ThenInclude(f => f.Category)  // Inkludera den virtuella egenskapen i Foods
-                       .AsNoTracking()
-                       .Where(o => o.ApplicationUserId == userId)
-                       .ToListAsync();
+                 .Include(o => o.FoodOrders)              // Inkludera OrderFood
+                     .ThenInclude(of => of.Food)          // Inkludera Food från OrderFood
+                         .ThenInclude(f => f.Category)    // Inkludera Category från Food
+                 .AsNoTracking()
+                 .Where(o => o.ApplicationUserId == userId)
+                 .ToListAsync();
         }
 
         public async Task PlaceOrderAsync(Order order)

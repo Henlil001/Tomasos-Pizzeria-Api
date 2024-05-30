@@ -18,7 +18,7 @@ namespace Tomasos_Pizzeria.Domain.Entities
         [Column(TypeName = "decimal(18, 2)")]
         public decimal DiscountAmount { get; set; }
         public string ApplicationUserId { get; set; }
-        [Required]
         public virtual ICollection<Food> Foods { get; set; }
+        public ICollection<FoodOrder> FoodOrders { get; set; }
     }
 }

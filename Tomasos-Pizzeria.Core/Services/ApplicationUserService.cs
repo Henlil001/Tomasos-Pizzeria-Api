@@ -105,6 +105,75 @@ namespace Tomasos_Pizzeria.Core.Services
 
         }
 
+        public async Task<bool> UpdateUserAsync(UserDTO user, string id)
+        {
+            try
+            {
+                // Hitta användaren med ID
+                var selectedUser = await _userManager.FindByIdAsync(id);
+
+                if (selectedUser == null)
+                    return false;
+
+                // Kontrollera om det nya användarnamnet redan finns
+                var checkUsername = await _userManager.FindByNameAsync(user.Username);
+
+                // Kontrollera att användarnamnet inte är upptaget av någon annan än den nuvarande användaren
+                if (checkUsername != null && checkUsername.Id != id)
+                    return false;
+
+                // Uppdatera användaregenskaper
+                selectedUser.UserName = user.Username;
+                selectedUser.Email = user.Email;
+                selectedUser.PhoneNumber = user.PhoneNr;
+
+                // Uppdatera användaren i databasen
+                var result = await _userManager.UpdateAsync(selectedUser);
+
+                if (!result.Succeeded)
+                     return false;
+
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while processing Update User.");
+                throw;
+            }
+        }
+        public async Task<bool> ChangePasswordAsync(string newPassword, string userId)
+        {
+            try
+            {
+                var selectedUser = await _userManager.FindByIdAsync(userId);
+                if (selectedUser == null) return false;
+
+                // Generate a password reset token
+                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(selectedUser);
+
+                // Reset the password
+                var result = await _userManager.ResetPasswordAsync(selectedUser, resetToken, newPassword);
+                if (!result.Succeeded)
+                {
+                    // Logga felmeddelanden från resultatet
+                    foreach (var error in result.Errors)
+                    {
+                        Console.WriteLine($"Fel: {error.Description}");
+                    }
+                    return false;
+                }
+
+                return result.Succeeded;
+                
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while processing UpdatePassword.");
+                throw;
+            }
+        }
+
         public async Task<string> UserLoginAsync(string username, string password)
         {
             _logger.LogError("Någon loggar in"); //För att se att jag kan logga till Application Insights
@@ -174,6 +243,7 @@ namespace Tomasos_Pizzeria.Core.Services
                     UserId = user.Id,
                     UserName = user.UserName,
                     Email = user.Email,
+                    Points = user.Points,
                     Roles = roles.ToList()
                 });
             }

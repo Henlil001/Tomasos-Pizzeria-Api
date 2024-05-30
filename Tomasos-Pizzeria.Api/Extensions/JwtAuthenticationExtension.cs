@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Tomasos_Pizzeria.Core;
+using static System.Net.WebRequestMethods;
 
 public static class JwtAuthenticationExtension
 {

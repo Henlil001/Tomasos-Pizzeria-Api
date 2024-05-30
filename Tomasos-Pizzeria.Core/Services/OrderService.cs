@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Tomasos_Pizzeria.Core.Interfaces;
 using Tomasos_Pizzeria.Data.Identity;
 using Tomasos_Pizzeria.Data.Interfaces;
+using Tomasos_Pizzeria.Domain.DTO;
 using Tomasos_Pizzeria.Domain.Entities;
 
 namespace Tomasos_Pizzeria.Core.Services
@@ -62,20 +63,22 @@ namespace Tomasos_Pizzeria.Core.Services
             }
         }
 
-        public async Task PlaceOrderAsync(List<int> foodsId, string userRole, string userId)
+        public async Task PlaceOrderAsync(List<OrderFoodDTO> foodsWithQuantitiesd, string userRole, string userId)
         {
             _logger.LogError("Någon lägger en order"); //För att se att jag kan logga till Application Insights
             try
             {
-                var foods = await _foodRepo.GetFoodsByIdAsync(foodsId);
+                var foodIds = foodsWithQuantitiesd.SelectMany(f => Enumerable.Repeat(f.FoodId, f.Quantity)).ToList();
+                var foods = await _foodRepo.GetFoodsByIdAsync(foodIds);
                 var order = new Order()
                 {
                     ApplicationUserId = userId,
-                    Foods = foods,
+                    Foods = new List<Food>(),
                     Status = "Order Registered",
                     Date = DateTime.Now,
                     TotalPrice = foods.Sum(f => f.Price),
                     Discount = false,
+                    FoodOrders = new List<FoodOrder>(),
                 };
                 decimal totalPrice = order.TotalPrice;
 
@@ -108,9 +111,7 @@ namespace Tomasos_Pizzeria.Core.Services
                         user.Points = 0;
 
                         if (restPoint >= 100)
-                        {
                             restPoint -= 100;
-                        }
                         else
                         {
                             order.Discount = true;
@@ -128,6 +129,16 @@ namespace Tomasos_Pizzeria.Core.Services
                     // Lägg till de resterande poängen om sådanna finns
                     user.Points += restPoint;
                     await _userManager.UpdateAsync(user);
+                }
+                foreach (var foodWithQuantity in foodsWithQuantitiesd)
+                {
+                    var orderFood = new FoodOrder
+                    {
+                        FoodID = foodWithQuantity.FoodId,
+                        OrderID = order.OrderID,
+                        Quantity = foodWithQuantity.Quantity,
+                    };
+                    order.FoodOrders.Add(orderFood);
                 }
                 //Lägger till ordern för både Regular, Premium och Admin
                 await _orderRepo.PlaceOrderAsync(order);

@@ -14,7 +14,7 @@ namespace Tomasos_Pizzeria.Api.Extensions
 
         public static async Task AddKeyVaultDbContextAndApplicationInsightsExtendedAsync(this WebApplicationBuilder builder)
         {
-            //sätta upp keyvault
+            ////sätta upp keyvault
             var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL");
 
             var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
@@ -24,18 +24,16 @@ namespace Tomasos_Pizzeria.Api.Extensions
 
             var client = new SecretClient(new Uri(keyVaultURL.Value!.ToString()), new DefaultAzureCredential());
 
-            var connString = (await client.GetSecretAsync("ADbCS")).Value.Value;
-            var secretKey = (await client.GetSecretAsync("SeacretKeyToken")).Value.Value;
-            var adminName = (await client.GetSecretAsync("AdminName")).Value.Value;
-            var issuerAudience = (await client.GetSecretAsync("IssuerAudience")).Value.Value;
+            var connString = (await client.GetSecretAsync("DbConnString")).Value.Value;
+            SecretKey.Key = (await client.GetSecretAsync("SeacretKeyToken")).Value.Value;
+            SecretKey.AdminName = (await client.GetSecretAsync("AdminName")).Value.Value;
+            SecretKey.IssuerAudience = (await client.GetSecretAsync("IssAud")).Value.Value;
             var applicationInsightsConnString = (await client.GetSecretAsync("ApplicationInsightsConnString")).Value.Value;
 
             //Lägger till ApplicationInsights
             builder.Services.AddApplicationInsightsTelemetry(applicationInsightsConnString);
 
-            SecretKey.Key = secretKey;
-            SecretKey.AdminName = adminName;
-            SecretKey.IssuerAudience = issuerAudience;
+         
 
             // Skapar upp databasen med våra entiteis-klass som blir en tabell
             builder.Services.AddDbContext<PizzeriaDbContext>(options =>

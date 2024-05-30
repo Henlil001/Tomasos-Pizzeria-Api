@@ -73,6 +73,19 @@ namespace Tomasos_Pizzeria.Data.Repos
 
             return true;
         }
+        public async Task FoodToOrderAsync(List<Food> updatedFoods, List<Food> oldFoods)
+        {
+            foreach (var newFood in updatedFoods)
+            {
+                foreach (var oldfood in oldFoods)
+                {
+                    _context.Entry(oldfood).CurrentValues.SetValues(newFood);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            await _context.SaveChangesAsync();
+
+        }
 
         public async Task<List<Food>> GetAllFoodsAsync()
         {
@@ -122,6 +135,18 @@ namespace Tomasos_Pizzeria.Data.Repos
         }
         public async Task<List<Food>> GetFoodsByIdAsync(List<int> foodIds)
         {
+            //var foodsToAdd = new List<Food>();
+            //foreach (var foodId in foodIds)
+            //{
+            //    var food = await _context.Foods.Include(f => f.Category).Include(f => f.Ingredients).Include(f => f.Orders).FirstOrDefaultAsync(f => f.FoodID == foodId);
+            //    if (food != null)
+            //    {
+            //        foodsToAdd.Add(food);
+            //    }
+            //}
+            //return foodsToAdd;
+
+
             var foods = await _context.Foods //om det är samma id två gånger tar den bara med det 1 gång måste fixa de
                                  .Where(f => foodIds.Contains(f.FoodID))
                                  .Include(f => f.Category)
@@ -142,7 +167,7 @@ namespace Tomasos_Pizzeria.Data.Repos
 
             return result;
 
-           
+
         }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Tomasos_Pizzeria.Core.Interfaces;
+using Tomasos_Pizzeria.Domain.DTO;
 
 namespace Tomasos_Pizzeria.Api.Controllers
 {
@@ -68,22 +69,25 @@ namespace Tomasos_Pizzeria.Api.Controllers
         [Authorize]
         [HttpPost]
         [Route("Place")]
-        public async Task<IActionResult> PlaceOrderAsync(List<int> foodIds)
+        public async Task<IActionResult> PlaceOrderAsync(List<OrderFoodDTO> foodsWithQuantity)
         {
-            if (foodIds is null)
+            if (ModelState.IsValid)
+            {
+                var userRole = User.FindFirst(ClaimTypes.Role).Value;
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                if (userRole is null || userId is null)
+                {
+                    _logger.LogDebug("Token with no Role/ID found");
+                    return StatusCode(500, "Error, Token with no Role/IDfound");
+                }
+                await _orderService.PlaceOrderAsync(foodsWithQuantity, userRole, userId);
+
+                return Ok("Order Placed Successfully");
+
+            }
                 return BadRequest();
 
-            var userRole = User.FindFirst(ClaimTypes.Role).Value;
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            if (userRole is null || userId is null)
-            {
-                _logger.LogDebug("Token with no Role/ID found");
-                return StatusCode(500, "Error, Token with no Role/IDfound");
-            }
-            await _orderService.PlaceOrderAsync(foodIds, userRole, userId);
-
-            return Ok("Order Placed Successfully");
         }
     }
 }
