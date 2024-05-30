@@ -272,8 +272,8 @@ namespace Tomasos_Pizzeria.Core.Services
 
             //Skapa options för att sätta upp en token
             var tokenOptions = new JwtSecurityToken(
-                    issuer: "https://localhost:7084",
-                    audience: "https://localhost:7084",
+                    issuer: SecretKey.IssuerAudience,
+                    audience: SecretKey.IssuerAudience,
                     claims: claims,
                     expires: DateTime.Now.AddMinutes(90),
                     signingCredentials: signinCredentials);
